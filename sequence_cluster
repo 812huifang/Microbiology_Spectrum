@@ -1,0 +1,7 @@
+for F in *.fq; do S=${F%.*}; usearch11 -search_pcr2 $F -fwdprimer GTAGWATWTTYTAYATTGAYGTW -revprimer ARTAYTTDCCDAYRWAWGGWTC -strand both -maxdiffs 4 -fastaout $S.fna -relabel $S.; done
+cat *.fna > all_seq.fna
+usearch11 -fastx_uniques all_seq.fna -fastaout uniques.fasta -sizeout -minuniquesize 2
+python TransNuc.py -f uniques.fasta > protein.faa
+python endcode_remove.py protein.faa uniques.fasta pro.faa uniques.fna
+usearch11 -cluster_otus uniques.fna -otus otus.fasta -relabel OTU 
+usearch11 -otutab all_seq.fna -otus otus.fasta -otutabout otutab.txt -id 0.97 -strand both
